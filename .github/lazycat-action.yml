@@ -1,0 +1,29 @@
+version: 1
+
+project:
+  root: .
+  build_config: lzc-build.yml
+  package_file: package.yml
+  output: .lazycat-build/musicgrabber.lpk
+  target_arch: amd64
+
+update:
+  strategy: publish
+  # 上游在 GitLab 且只打 tag 不发镜像；版本随打包仓库走（拉取的上游 commit 固定在 UPSTREAM.conf）。
+  version_source:
+    type: git
+
+build:
+  toolchains:
+    - kind: docker
+  run_buildscript: true
+  # 源码不入库：build.sh 在构建前拉取上游（不允许存源码进镜像层以外的地方）
+
+stores:
+  private:
+    enabled: true
+    skip_if_version_exists: true
+    name: MusicGrabber
+    summary: "MusicGrabber 懒猫微服打包：自托管音乐获取服务（搜索 YouTube/SoundCloud/Soulseek，抓取单曲/专辑自动入库，Unlicense 开源）。"
+  official:
+    enabled: false

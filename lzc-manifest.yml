@@ -1,0 +1,58 @@
+application:
+  subdomain: musicgrabber
+  multi_instance: false
+  # 无内置强制账号体系：无用户/单用户模式完全免密（上游 count>=2 才启用登录），
+  # 多用户模式由用户在设置页自行开启，届时用界面登录即可，无需注入。
+  public_path:
+    - /
+  upstreams:
+    - location: /
+      backend: http://musicgrabber:8080/
+services:
+  musicgrabber:
+    # 源码构建（context=upstream，上游 Dockerfile 改编）；由 Action 以 builder:local 内嵌进 LPK
+    image: embed:musicgrabber
+    # 上游 compose 要求 2GB 共享内存：浏览器兜底（Spotify/Amazon 歌单抓取）需要
+    shm_size: 2g
+    environment:
+      # 必需路径
+      - MUSIC_DIR=/music
+      - DB_PATH=/data/music_grabber.db
+      # Soulseek 完成目录（可选功能，目录内无文件不影响其他音源）
+      - SLSKD_DOWNLOADS_PATH=/downloads
+      # 懒猫网关域名放行（上游按 Host 校验流媒体 referer 等场景）
+      - TRUSTED_PROXIES=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -f http://localhost:8080/ || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    binds:
+      # 音乐库（应用内下载落盘目录；可在设置里改）
+      - /lzcapp/var/music:/music
+      # 任务数据库与设置（SQLite）
+      - /lzcapp/var/data:/data
+      # Soulseek（slskd）完成目录占位，未部署 slskd 时为空目录不影响运行
+      - /lzcapp/var/downloads:/downloads
+    mem_limit: 4g
+
+usage: |
+  MusicGrabber 是自托管音乐获取服务（Unlicense 公共领域开源）：搜索 YouTube、SoundCloud、
+  Soulseek 等音源，抓取单曲/专辑，自动打标签并放入音乐库；支持关注歌单与歌手自动追新。
+
+  【首次使用】
+  1. 打开应用即可直接使用（默认单用户模式，无需登录）。
+  2. 在 Settings 里把「音乐库目录」保持为 /music 即可（下载的音乐落在这里）。
+  3. 可选集成：Navidrome/Jellyfin（填写地址与凭据后下载完自动入媒体库）、Soulseek（slskd）、
+     Telegram/邮件通知等，均在 Settings 配置。
+  4. 如需多用户与登录：在 Settings 的用户管理里添加第二个账号，应用即切换为登录模式
+     （首个账号为管理员）。
+
+  【说明】
+  - 数据（SQLite 任务库与设置）持久化在应用数据目录 /data，升级不丢。
+  - 浏览器兜底抓取（Spotify/Amazon 歌单）需要较大共享内存，已按上游建议配置 2GB。
+  - 上游源码按 UPSTREAM.conf 固定 commit 拉取构建（不入打包仓库）；
+    开源地址 https://gitlab.com/g33kphr33k/musicgrabber

@@ -1,0 +1,21 @@
+package: community.lazycat.app.musicgrabber
+version: 4.6.1
+name: MusicGrabber
+description: "Self-hosted music acquisition service: search YouTube, SoundCloud, Soulseek and lossless sources, grab a single track or full album, auto-tag and drop into your Navidrome/Jellyfin library. Watched playlists and artists keep the library current; multi-user support included."
+min_os_version: 1.5.0
+homepage: https://gitlab.com/g33kphr33k/musicgrabber
+author: g33kphr33k
+license: Unlicense
+permissions:
+  required:
+    - net.internet
+locales:
+  zh:
+    name: "MusicGrabber"
+    description: "自托管音乐获取服务：搜索 YouTube、SoundCloud、Soulseek 与无损音源，抓取单曲或整张专辑，自动打标签并放入 Navidrome/Jellyfin 音乐库。支持关注歌单与歌手自动追新、多用户模式。"
+  zh_CN:
+    name: "MusicGrabber"
+    description: "自托管音乐获取服务：搜索 YouTube、SoundCloud、Soulseek 与无损音源，抓取单曲或整张专辑，自动打标签并放入 Navidrome/Jellyfin 音乐库。支持关注歌单与歌手自动追新、多用户模式。"
+  en:
+    name: "MusicGrabber"
+    description: "Self-hosted music acquisition service: search YouTube, SoundCloud, Soulseek and lossless sources, grab a single track or full album, auto-tag and drop into your Navidrome/Jellyfin library. Watched playlists and artists keep the library current; multi-user support included."
